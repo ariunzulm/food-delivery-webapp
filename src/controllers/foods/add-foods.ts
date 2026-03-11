@@ -1,15 +1,19 @@
-import { Context } from "hono";
-import { foods } from "../../model/foods";
+import { getDrizzleDb } from "../../db";
+import { foodsTable } from "../../db/foods";
+import { AppContext } from "../../types";
 
-export const addFoods = async (c: Context) => {
-  const { name, category } = await c.req.json();
+export const addFoods = async (c: AppContext) => {
+  const d1 = c.env.FOOD_DELIVERT;
+  const db = getDrizzleDb(d1);
+
+  const { name, ingredients } = await c.req.json();
+
   const newFood = {
-    id: foods.length + 1,
-    name,
-    category,
+    name: name,
+    ingredients,
   };
-  foods.push(newFood);
 
-  c.status(200);
-  return c.json({ success: true, foods: foods });
+  const [food] = await db.insert(foodsTable).values(newFood).returning();
+
+  return c.json({ food });
 };

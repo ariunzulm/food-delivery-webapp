@@ -1,14 +1,17 @@
-import { Context } from "hono";
-import { foods } from "../../model/foods";
+import { eq } from "drizzle-orm";
+import { getDrizzleDb } from "../../db";
+import { foodsTable } from "../../db/foods";
+import { AppContext } from "../../types";
 
-export const deleteFood = (c: Context) => {
+export const deleteFood = async (c: AppContext) => {
+  const d1 = c.env.FOOD_DELIVERT;
+  const db = getDrizzleDb(d1);
+
   const id = c.req.param("id");
 
-  const fileteredFood = foods.filter((food) => String(food.id) !== String(id));
-  
+  if (!id) return c.json({ message: "not found" });
 
-  console.log(fileteredFood, "filter");
+  await db.delete(foodsTable).where(eq(foodsTable.id, Number(id)));
 
-  c.status(200);
-  return c.json({ success: true, foods: fileteredFood });
+  return c.json({ success: true });
 };

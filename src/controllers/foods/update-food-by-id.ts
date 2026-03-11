@@ -1,23 +1,21 @@
-import { Context } from "hono";
-import { foods } from "../../model/foods";
+import { eq } from "drizzle-orm";
+import { getDrizzleDb } from "../../db";
+import { foodsTable } from "../../db/foods";
+import { AppContext } from "../../types";
 
-export const updateFoodById = async (c: Context) => {
+export const updateFoodById = async (c: AppContext) => {
+  const d1 = c.env.FOOD_DELIVERT;
+  const db = getDrizzleDb(d1);
+
   const id = c.req.param("id");
 
-  const { name, category } = await c.req.json();
-  const updatedFoods = foods.map((food) => {
-    if (String(food.id) === id) {
-      const updatedFood = {
-        ...foods,
-        name,
-        category,
-      };
-      return updatedFood;
-    } else {
-      return food;
-    }
-  });
+  const { name, ingredients } = await c.req.json();
 
-  c.status(200);
-  return c.json({ success: true, foods: updatedFoods });
+  const result = await db
+    .update(foodsTable)
+    .set({ name, ingredients })
+    .where(eq(foodsTable.id, Number(id)))
+    .returning();
+
+  return c.json({ result });
 };

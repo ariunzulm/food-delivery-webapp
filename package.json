@@ -2,14 +2,22 @@
   "name": "food-delivery",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --remote",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
-    "hono": "^4.12.5"
+    "@libsql/client": "^0.17.0",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
+    "hono": "4.12.5"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260310.1",
+    "drizzle-kit": "^0.31.9",
+    "tsx": "^4.21.0",
     "wrangler": "^4.4.0"
   }
 }
